@@ -21,20 +21,22 @@ void hierarchical_clustering(std::list<T> &clusters)
                                      [] (const T &a, const T &b ){
                                          return nextRightNeighbourDistance(a) < nextRightNeighbourDistance(b);
                                      });
+        auto minimum_distance = nextRightNeighbourDistance(*left);
         auto right(left);
         auto advance_right = nextRightNeighbour(*left);
+        auto index_left=distance(begin(clusters),left);
+        auto index_right=index_left+advance_right;
         do
         {
             ++right;
-        }
-        while (--advance_right >= 0);
+        } while (--advance_right >= 0);
         /* Distances to the next right */
         for_each(
                 begin(clusters), right,
-                [left, right](T cluster){
-                    updateDistances(cluster, *left, *right);
+                [minimum_distance, index_left, index_right](T & cluster){
+                    updateDistances(cluster, minimum_distance, index_left, index_right);
                 });
-        *left = merge(*left, *right);
+        mergeInto(*left, *right);
         clusters.erase(right);
     }
 }

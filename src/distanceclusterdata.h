@@ -2,10 +2,12 @@
 #define DISTANCE_CLUSTER_DATA_H_
 
 #include <string>
+#include <vector>
 class DistanceClusterData
 {
 
 	public:
+		explicit DistanceClusterData(std::vector<float> distances_to_right_neighbours){};
 		float nextRightNeighbourDistance() const
 		{
 			return 0;
@@ -15,7 +17,7 @@ class DistanceClusterData
 			return 1;
 		};
 
-		std::string print() const;
+		std::string print() const {return std::string("");};
 
 };
 

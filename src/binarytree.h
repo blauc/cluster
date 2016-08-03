@@ -64,25 +64,23 @@ class BinaryTree
                 }
                 T & operator*()
                 {
-                    return *(current_branch_->value);
+                    return *(current_branch_->value_);
                 }
             private:
                 BinaryTree<T>* current_branch_;
                 std::list<BinaryTree<T>*> next_branches;
         };
-        BinaryTree(std::unique_ptr<BinaryTree<T>> &&left, std::unique_ptr<BinaryTree<T>> &&right, std::unique_ptr<T> &&value) :
-            left_(left), right_(right), value_(value){};
         BinaryTree(std::unique_ptr<T> &&value) :
-            left_(nullptr), right_(nullptr), value_(value){};
+            left_(nullptr), right_(nullptr), value_(std::move(value)){};
         BinaryTree left(){return *left_; };
         BinaryTree right(){return *right_; };
         T & value() const {return *value_; } ;
-        BinaryTree::iterator begin();
-        BinaryTree::iterator end();
+        BinaryTree::iterator begin(){};
+        BinaryTree::iterator end(){};
 
     private:
-        std::unique_ptr<BinaryTree> right_;
         std::unique_ptr<BinaryTree> left_;
+        std::unique_ptr<BinaryTree> right_;
         std::unique_ptr<T>          value_;
 };
 
