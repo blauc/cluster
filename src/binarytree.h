@@ -19,7 +19,7 @@ class BinaryTree
         class iterator : public std::iterator<std::forward_iterator_tag, T>
         {
             public:
-                iterator (BinaryTree<T> temp) : current_branch_(&temp) {};
+                iterator (BinaryTree<T> * temp) : current_branch_(temp) {};
                 iterator (const iterator &other) : current_branch_(other.current_branch_), next_branches(std::move(other.next_branches)) {};
                 iterator &operator++()
                 {
@@ -62,25 +62,35 @@ class BinaryTree
                 {
                     return !(*this == rhs);
                 }
-                T & operator*()
+                T &operator*()
                 {
                     return *(current_branch_->value_);
                 }
             private:
-                BinaryTree<T>* current_branch_;
+                BinaryTree<T>           * current_branch_;
                 std::list<BinaryTree<T>*> next_branches;
         };
-        BinaryTree(std::unique_ptr<T> &&value) :
+        BinaryTree(std::unique_ptr<T> value) :
             left_(nullptr), right_(nullptr), value_(std::move(value)){};
-        BinaryTree left(){return *left_; };
-        BinaryTree right(){return *right_; };
-        T & value() const {return *value_; } ;
-        BinaryTree::iterator begin(){};
-        BinaryTree::iterator end(){};
+        BinaryTree(std::unique_ptr<BinaryTree<T>> left,std::unique_ptr<BinaryTree<T>> right, std::unique_ptr<T> value) :
+            left_(std::move(left)), right_(std::move(right)), value_(std::move(value))
+        {
+        };
+        BinaryTree<T> left(){return *left_; };
+        BinaryTree<T> right(){return *right_; };
+        T &operator* () {return *value_; };
+        iterator begin()
+        {
+            return iterator(this);
+        };
+        iterator end()
+        {
+            return iterator(nullptr);
+        };
 
     private:
-        std::unique_ptr<BinaryTree> left_;
-        std::unique_ptr<BinaryTree> right_;
+        std::unique_ptr<BinaryTree<T>> left_;
+        std::unique_ptr<BinaryTree<T>> right_;
         std::unique_ptr<T>          value_;
 };
 
