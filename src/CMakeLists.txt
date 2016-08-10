@@ -1,1 +1,1 @@
-add_executable (clustertest test.cpp)
+add_executable (clustertest distancecluster.cpp test.cpp)

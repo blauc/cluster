@@ -7,37 +7,31 @@
 #include "distancecluster.h"
 #include "cluster.h"
 
-float
-mergeDistance(float minimum_distance, std::size_t size_left, std::size_t size_right, float d_left, float d_right )
-{
-    float ai = 1;
-    float aj = 1;
-    float b  = 1;
-    float g  = 1;
-    return ai * d_left + aj * d_right + b * minimum_distance + g * std::fabs(d_left - d_right);
-}
 
 int main ()
 {
-    std::list < std::vector < float>> distance_matrix { {
-                                                            1, 2, 3, 4
-                                                        }, {
-                                                            1, 2, 3
-                                                        }, {
-                                                            1, 2
-                                                        }, {
-                                                            1
-                                                        }};
+    std::list < std::vector < float>> distance_matrix { { 1, 2, 3 }, { 1, 2 }, { 1 }, {}};
     std::list <DistanceCluster> clusters;
-    std::size_t i = 0;
+    std::list < std::vector < std::size_t>> cluster_ids { { 1 }, { 2 }, { 3 }, { 4 }};
+    auto cluster_id = cluster_ids.begin();
     for (auto &distance_matrix_row : distance_matrix)
     {
-        clusters.emplace_back( DistanceCluster(std::move(distance_matrix_row), std::move(std::vector<std::size_t>{++i}), 0));
+        clusters.emplace_back( DistanceCluster(std::move(distance_matrix_row), std::move(*cluster_id)));
+        ++cluster_id;
     }
-    auto result = hierarchical_clustering(clusters, mergeDistance);
-    for (const auto &branch : *result)
+    auto result = hierarchical_merge_into_tree(clusters, LanceWilliamsUpdate<DistanceCluster::DistanceType>::simple_average);
+
+    std::string out;
+    auto cut_predicate = [](DistanceCluster & a){return a.elements()[0]==1;};
+    auto cut_branches = result->cut(cut_predicate);
+    for (auto &branch : *result)
     {
-        branch.print();
+        out += (*branch).print();
     }
+    auto clusterbottom = result->bottom();
+    for (const auto &branch : clusterbottom){
+        out += (**branch).print();
+    }
+    fprintf(stderr, "%s\n", out.c_str());
     return 0;
 }
